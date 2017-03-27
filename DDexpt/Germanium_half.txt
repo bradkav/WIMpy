@@ -1,0 +1,45 @@
+N_isotopes	2
+
+m_1	73
+frac_1	0.078
+J_1	4.5
+Sp_1	0.069
+Sn_1	0.339
+N_p_1	32
+N_n_1	41
+
+
+N00_1	0
+alpha00_1	0
+beta00_1	0
+
+N11_1	0.12
+alpha11_1	6	
+beta11_1	0.024
+
+-------------------
+
+m_2	73
+frac_2	0.922
+J_2	0
+
+N_p_2	32
+N_n_2	41
+
+------------------
+
+m_det	1050
+exposure	365
+E_min	5
+E_max	100
+
+
+BG_level	1e-10
+dE	1e-6
+
+USE_BINNED_DATA	0
+bin_width	1e-6
+
+USE_DIR 0
+DATA_FORMAT 1
+
