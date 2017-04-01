@@ -57,7 +57,7 @@ for i in range(N_expt):
 
 print " Calculating likelihoods..."
 Nmvals = 25
-mlist = np.logspace(np.log10(20), np.log10(100), Nmvals)
+mlist = np.logspace(np.log10(20), np.log10(1000), Nmvals)
 likelist = np.zeros((Nmvals, 5))
 
 #Different numbers of grid points to try
@@ -105,5 +105,10 @@ pl.ylim(-1, 30)
 pl.xlim(10, 1000)
 pl.axvline(m0, linestyle='--', color='k')
 pl.axhline(0, linestyle='--', color='k')
+pl.xlabel(r"$m_\chi [GeV]$")
+pl.ylabel(r"$-2 \Delta \mathrm{log}\mathcal{L}$")
+
+
+pl.savefig("plots/GridComparison.pdf")
 pl.show()
 
