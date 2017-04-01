@@ -57,7 +57,7 @@ for i in range(N_expt):
 
 print " Calculating likelihoods..."
 Nmvals = 25
-mlist = np.logspace(np.log10(10), np.log10(100), Nmvals)
+mlist = np.logspace(np.log10(20), np.log10(100), Nmvals)
 likelist = np.zeros((Nmvals, 5))
 
 #Different numbers of grid points to try
@@ -70,7 +70,7 @@ likelist_dir = np.zeros((Nmvals, 4))
 
 for i, mi in enumerate(mlist):
     print "   ",i+1, "of", Nmvals,": m_x =", mi, "GeV"
-    for j in range(3,4):
+    for j in range(4):
         likelist_maj[i,j], likelist_dir[i,j] = CalcLike_grid(mi, expts, Ngrid[j], refine[j])
         
 for j in range(4):
