@@ -80,12 +80,12 @@ class Experiment:
             
             
         No = len(self.events)
-        self.R_list = np.zeros((No, self.N_iso))
+        self.R_list = np.zeros((self.N_iso, No))
         for i in range(self.N_iso):
             for j in range(No):
-                self.R_list[j,i] = self.dRdEi(self.events[j], mx, i)
+                self.R_list[i,j] = self.dRdEi(self.events[j], mx, i)
     
-        self.eventlike = np.sum(np.log(self.R_list[:,0]))
+        self.eventlike = np.sum(np.log(self.R_list[0,:]))
     
     def PrintEvents(self):
         print self.events
