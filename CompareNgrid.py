@@ -14,7 +14,7 @@ print "*   CompareNgrid.py   *"
 print "***********************"
 print " "
 
-print " Comparing sampling grids for calculating the likelihood..."
+print " Code for comparing sampling grids for calculating the likelihood..."
 
 
 

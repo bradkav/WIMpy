@@ -10,7 +10,8 @@ print "*       WIM.py        *"
 print "***********************"
 print " "
 
-print " Calculating significance of discriminating between Dirac and Majorana DM..."
+print " Code for calculating significance of discriminating between Dirac and Majorana DM..."
+print " "
 
 #Get inputs from command line
 ensemble = sys.argv[1]
