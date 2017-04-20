@@ -22,26 +22,6 @@ print " Comparing sampling grids for calculating the likelihood..."
 m0 = float(sys.argv[1])
 index = int(sys.argv[2])
 
-target_sigma = 1e-46
-if (m0 < 30):
-    target_sigma = 2e-46
-if (m0 > 100):
-    target_sigma = 1e-45
-
-#Calculate couplings from index on grid
-l = CPP.GeneratePoint_ind(index)
-
-#Rescale couplings to give 'target' DM-proton effective coupling in Xenon
-sig0 = (1.973e-14*1.973e-14)*4.0*(reduced_m(1.0, m0))**2.0/np.pi
-sig = sig0*0.5*((l[0]*54.0 + l[1]*77.0)**2.0 + (l[2]*54.0 + l[3]*77.0)**2.0)
-sig_p = sig/(54+77)**2
-l0 = l*np.sqrt(target_sigma/sig_p)
-
-
-#l0 is in the format [lpD, lnD, lpDb, lnDb]
-print " DM mass [GeV]:", m0
-print " lambda [GeV^-2]:", l0
-print " "
 
 #----Functions----
 
@@ -50,19 +30,54 @@ exptlist = ["Xenon2", "Argon", "Silicon"]
 N_expt = len(exptlist)
 expts = [ Experiment(exptlist[i] + ".txt") for i in range(N_expt)]
 
+
+#Generate couplings from index:                                               
+l = CPP.GeneratePoint_ind(index)
+
+#This is where we calculate the normalisation of the couplings                
+#Aim for the same number of events in Xenon as:                               
+# sigma = 1e-46 and m = 50                                                    
+sig0 = expts[0].sig_eff(50, l)
+l *= np.sqrt(1e-46/sig0)
+Ntarget = expts[0].CalcNevents(50, l)
+print " Target number of events in Xenon:", Ntarget
+
+#Rescale to give correct event numbers for mass m0                            
+l *= np.sqrt(Ntarget/expts[0].CalcNevents(m0, l))
+
+
+#l is in the format [lpD, lnD, lpDb, lnDb]
+print " "
+print " DM mass [GeV]:", m0
+print " lambda [GeV^-2]:", l
+print " f =", CPP.getf(index)
+print " c_n/c_p =", CPP.Calc_Rpn(l)
+print " "
+for i in range(N_expt):
+    print " Ne(" + exptlist[i] + "): ", expts[i].CalcNevents(m0,l), "; sig_p =", expts[i].sig_eff(m0, l)
+print " "
+
+
 print " Generating events..."
 for i in range(N_expt):
-    expts[i].GenerateEvents(m0, l0)
+    expts[i].GenerateEvents(m0, l)
 
 
 print " Calculating likelihoods..."
-Nmvals = 25
-mlist = np.logspace(np.log10(20), np.log10(1000), Nmvals)
+Nmvals = 20
+
+mlist = np.logspace(np.log10(m0/2.0), np.log10(m0*2.0), Nmvals)
+
+if (m0 > 200):
+    mlist = np.logspace(np.log10(m0/10.0), np.log10(m0*10.0), Nmvals)
+
+
+
 likelist = np.zeros((Nmvals, 5))
 
 #Different numbers of grid points to try
-Ngrid = [50, 100, 200, 100]
-refine = [False, False, False, True]
+Ngrid = [50, 100, 100, 200]
+refine = [False, False, True, True]
 #In the last case, we use 100 points but refine the grid
 
 likelist_maj = np.zeros((Nmvals, 4))
@@ -71,6 +86,7 @@ likelist_dir = np.zeros((Nmvals, 4))
 for i, mi in enumerate(mlist):
     print "   ",i+1, "of", Nmvals,": m_x =", mi, "GeV"
     for j in range(4):
+        #print j
         likelist_maj[i,j], likelist_dir[i,j] = CalcLike_grid(mi, expts, Ngrid[j], refine[j])
         
 for j in range(4):
@@ -82,14 +98,16 @@ for j in range(4):
 
 
 lines = [":", "-.", "--", "-"]
-labels = ["N=50", "N=100", "N=200", "N=100 (refined)"]
+labels = ["N=50", "N=100",  "N=100 (refined)", "N=200 (refined)",]
 
 pl.figure()
+L0_global = np.nanmax(likelist_dir)
 for j in range(4):
     L0 = np.nanmax(likelist_dir[:,j])
-    pl.semilogx(mlist, -2*(likelist_maj[:,j]-L0), 'b',\
+    #print L0
+    pl.semilogx(mlist, -2*(likelist_maj[:,j]-L0_global), 'b',\
         linestyle=lines[j], linewidth=1.5)
-    pl.semilogx(mlist, -2*(likelist_dir[:,j]-L0), 'r',\
+    pl.semilogx(mlist, -2*(likelist_dir[:,j]-L0_global), 'r',\
         linestyle=lines[j], linewidth=1.5)
 
 #Add dummy lines for labels
@@ -101,7 +119,7 @@ for j in range(4):
 
 
 pl.legend(loc="best", frameon=False)
-pl.ylim(-1, 30)
+pl.ylim(-1, 100)
 pl.xlim(10, 1000)
 pl.axvline(m0, linestyle='--', color='k')
 pl.axhline(0, linestyle='--', color='k')

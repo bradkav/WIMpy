@@ -3,11 +3,11 @@ from numpy import pi
 
 
 #---Constants-----
+
+#Define the grid of coupling values to evaluate over
 Np = 32
-Rrange = np.linspace(0.6, 1.1, Np)
-#frange = np.linspace(-1.0, -0.95, Np)
-#vals = np.unravel_index(pID-1, (Np,Np), order='C')
-frange = np.append(np.linspace(-1.0, -0.975, 3*Np/4), np.linspace(-0.975, -0.95, Np/4))
+Rrange = np.linspace(0.6, 1.05, Np)
+frange = np.append(np.linspace(-1.0, -0.975, 3*Np/4), np.linspace(-0.975, -0.94, Np/4))
 
 #Format of coupling vector is always:
 #l_p_D, l_n_D, l_p_Dbar, l_n_Dbar                                                                                                                             
@@ -32,15 +32,15 @@ def GeneratePoint_ind(index):
     fval = frange[vals[0]]
     Rval = Rrange[vals[1]]
     
-    return GeneratePoint(1.0/Rval, fval)
+    return GeneratePoint(Rval, fval)
                                                   
-def GeneratePoint(Rpn, f):
+def GeneratePoint(Rnp, f):
     #Assume that l_p_D = 1 and l_p_Dbar = 0                                                                                                                   
     l_p_D = 1.0
     l_p_Dbar = 0.0
 
-    l_n_D = f/Rpn
-    l_n_Dbar = np.sqrt((1.0-f**2))/Rpn
+    l_n_D = f*Rnp
+    l_n_Dbar = np.sqrt((1.0-f**2))*Rnp
 
     return np.array([l_p_D, l_n_D, l_p_Dbar, l_n_Dbar])
 
