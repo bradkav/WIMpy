@@ -6,8 +6,8 @@ from scipy.interpolate import interp1d, interp2d
 
 
 class Experiment:
-    def __init__(self, exptfile_root, m_min=1.0, m_max=1e3):
-        exptfile = "DDexpt/"+exptfile_root
+    def __init__(self, exptfile, m_min=1.0, m_max=1e3):
+        #exptfile = "DDexpt/"+exptfile_root
         self.N_iso = int(MP.ReadParam(exptfile, "N_isotopes"))
         self.frac = np.zeros(self.N_iso)
         self.N_p = np.zeros(self.N_iso)
