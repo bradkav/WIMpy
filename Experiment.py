@@ -1,8 +1,9 @@
 import numpy as np
 import DMUtils as DMU
 import MyParser as MP
+import matplotlib.pyplot as pl
 from scipy.integrate import quad, cumtrapz
-from scipy.interpolate import interp1d, interp2d
+from scipy.interpolate import interp1d, interp2d, RectBivariateSpline
 
 
 class Experiment:
@@ -25,6 +26,7 @@ class Experiment:
         self.R_list = []
         self.Ne_list = []
         self.eventlike = []
+        self.eventlike_interp = []
     
     def dRdEi(self,E,mx, i):
         R = self.exposure*self.frac[i]*DMU.dRdE(E, self.N_p[i], self.N_n[i], mx, [1.0/self.N_p[i],0.0,0.0,0.0])
@@ -88,10 +90,36 @@ class Experiment:
         self.R_list = np.zeros((self.N_iso, No))
         for i in range(self.N_iso):
             for j in range(No):
-                self.R_list[i,j] = self.dRdEi(self.events[j], mx, i)
+                self.R_list[i,j] = self.dRdEi(self.events[j], mx, i)/self.Ne_list[i]
+        
+        #print self.R_list[0,:]
     
-        self.eventlike = np.sum(np.log(self.R_list[0,:]))
-    
+        self.eventlike = np.sum(np.log(self.Ne_list[0]*self.R_list[0,:]))
+
+        if (self.N_iso > 1):
+            Np = 201
+            datgrid = np.zeros((Np,Np))
+            pivals = np.linspace(0.0, 1.0, Np)
+            pjvals = np.linspace(0.0, 1.0, Np)
+            for i, pi in enumerate(pivals):
+                for j, pj in enumerate(pjvals):
+                    pk = 1.0 - (pi + pj)
+                    if (pk < 0):
+                        datgrid[i,j] = 0
+                    else:
+                        pvals = np.asarray([pi, pj, pk])
+                        datgrid[i,j] = np.sum(np.log(np.dot(pvals,self.R_list)))
+
+            datgrid = datgrid +  (datgrid[::-1, ::-1]).T
+            for i in range(Np):
+                datgrid[Np-1-i, i] *= 0.5
+            
+            self.eventlike_interp = RectBivariateSpline(pivals,pjvals,datgrid,\
+                     kx=1, ky=1, s=0)
+            #print self.eventlike_interp(0.98, 0.02)
+                
+        
+        
     def PrintEvents(self):
         print self.events
     
