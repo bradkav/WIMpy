@@ -7,6 +7,7 @@ def ReadParam(filename, param_name):
         if (len(vals) > 0):
             if (vals[0] == param_name):
                 return vals[1]
+    return -1
 
 
 #f=open("Xenon.txt")
