@@ -79,6 +79,8 @@ class Experiment:
         xvals = np.random.rand(No)
         self.events = fx(xvals)
     
+    #TabulateAll is used to precalculate some stuff which is needed
+    #for calculation of likelihoods
     def TabulateAll(self, mx):
     
         self.Ne_list = np.zeros(self.N_iso)
